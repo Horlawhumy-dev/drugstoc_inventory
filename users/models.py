@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils.translation import gettext_lazy as _
 from django.db.models import (
     CASCADE,
     CharField,
@@ -15,6 +16,7 @@ def default_user_metadata():
     return {"is_admin": False}
 
 class User(AbstractUser):
+    name = CharField(_("Name of User"), blank=True, null=True, max_length=255)
     email = models.EmailField(unique=True) 
     address = models.CharField(max_length=100, blank=True, null=True)
     metadata = JSONField(default=default_user_metadata)
