@@ -6,7 +6,7 @@ from django.db.models import (
     DateTimeField,
     ForeignKey,
     JSONField,
-    OneToOneField,
+    EmailField
 )
 from drugstoc_inventory.model_utils import BaseModelMixin
 from users.managers import UserManager
@@ -15,6 +15,7 @@ def default_user_metadata():
     return {"is_admin": False}
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True) 
     address = models.CharField(max_length=100, blank=True, null=True)
     metadata = JSONField(default=default_user_metadata)
 
