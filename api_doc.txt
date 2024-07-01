@@ -4,98 +4,21 @@ This application provides a RESTful API for Drugstoc Inventory Management.
 
 Endpoints:
 
-1. POST /authors/
-   - Description: Create a new author
-   - Request Body: AuthorCreate schema
-   - Response: Author schema
+1. POST `/api/users/register/`
+   - Description: Create a new user
+   - Request Body: name, email, password, password2, address
+   - Response: name, email, password, password2, address
 
-2. GET /authors/
-   - Description: Retrieve a list of authors
-   - Query Parameters:
-     - skip (int, optional): Number of authors to skip (default: 0)
-     - limit (int, optional): Maximum number of authors to return (default: 10)
-   - Response: List of Author schemas
+2. POST `/api/users/login/`
+   - Description: login user
+   - Request Body: email, password
+   - Response: id, metadata, refresh_token, access_token
 
-3. GET /authors/{author_id}
-   - Description: Retrieve an author by ID
-   - Path Parameters:
-     - author_id (int): The ID of the author to retrieve
-   - Response: Author schema
-   - Exceptions:
-     - 404 Not Found: If the author is not found
+3. GET `/api/users/profile`
+   - Description: Retrieve user profile by access token provided
+   - Response: all user fields
 
-4. PATCH /authors/{author_id}
-   - Description: Update an existing author
-   - Path Parameters:
-     - author_id (int): The ID of the author to update
-   - Request Body: AuthorUpdate schema
-   - Response: Author schema
-   - Exceptions:
-     - 404 Not Found: If the author is not found
-
-5. DELETE /authors/{author_id}
-   - Description: Delete an author
-   - Path Parameters:
-     - author_id (int): The ID of the author to delete
-   - Response: 204 No Content
-   - Exceptions:
-     - 404 Not Found: If the author is not found
-
-Schemas:
-
-1. Author
-   - Properties:
-     - id (int): The unique identifier of the author
-     - name (str): The name of the author
-
-2. AuthorCreate
-   - Properties:
-     - name (str): The name of the author to create
-
-3. AuthorUpdate
-   - Properties:
-     - name (str): The updated name of the author
-
-
-Post Endpoints:
-
-1. GET /posts/?author_id={author_id}
-   - Description: Retrieve a list of all posts for a specific author
-   - Query Parameters:
-     - author_id (int): The ID of the author to filter the posts by
-   - Response: List of Post schemas
-
-2. GET /posts/{post_id}/?author_id={author_id}
-   - Description: Retrieve a specific post by ID for a given author
-   - Path Parameters:
-     - post_id (int): The ID of the post to retrieve
-     - author_id (int): The ID of the author to filter the post by
-   - Response: Post schema
-   - Exceptions:
-     - 404 Not Found: If the post is not found for the given author
-
-3. POST /posts/?author_id={author_id}
-   - Description: Create a new post by a specific author
-   - Query Parameters:
-     - author_id (int): The ID of the author creating the post
-   - Request Body: PostCreate schema
-   - Response: Post schema
-
-4. PUT /posts/{post_id}/?author_id={author_id}
-   - Description: Update an existing post for a specific author
-   - Path Parameters:
-     - post_id (int): The ID of the post to update
-     - author_id (int): The ID of the author updating the post
-   - Request Body: PostCreate schema
-   - Response: Post schema
-   - Exceptions:
-     - 404 Not Found: If the post is not found for the given author
-
-5. DELETE /posts/{post_id}/?author_id={author_id}
-   - Description: Delete a post by a specific author
-   - Path Parameters:
-     - post_id (int): The ID of the post to delete
-     - author_id (int): The ID of the author deleting the post
-   - Response: 204 No Content
-   - Exceptions:
-     - 404 Not Found: If the post is not found for the given author
+4. POST `/api/users/logout/`
+   - Description: Logout user
+   - Request Body: refresh_token
+   - Response: nil
