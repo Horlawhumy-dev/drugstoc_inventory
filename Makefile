@@ -1,8 +1,5 @@
-install-with-cache:
+install:
 	pip3 install -r requirements.txt
-
-install-with-no-cache:
-	pip3 install -r requirements.txt --no-cache
 
 runserver:
 	python3 manage.py runserver
