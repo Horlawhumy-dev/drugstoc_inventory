@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from .models import Product, Order
+from django.db.models import Sum, F
+from datetime import datetime, timedelta
+from .models import Product, Order, OrderItem
 from users.permissions import IsAdminOrReadOnly
-from .serializers import ProductSerializer, OrderSerializer
+from .serializers import ProductSerializer, OrderSerializer, LowStockProductSerializer, SalesReportSerializer
 from django.db import transaction
 from users.authentication import CustomJWTAuthentication
 
@@ -171,3 +173,45 @@ class OrderStatusUpdate(APIView):
         except Exception as e:
             logger.error(f"Failed to update status for order {order.id}: {str(e)}")
             return None
+
+
+class LowStockReportView(APIView):
+    """
+        Should be accessed by an admin but GET is part of SAFE METHODS for all
+    """
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]
+    authentication_classes = [CustomJWTAuthentication]
+    def get(self, request):
+        low_stock_products = Product.objects.filter(quantity__lt=10)
+        serializer = LowStockProductSerializer(low_stock_products, many=True)
+        return Response(serializer.data)
+
+class SalesReportView(APIView):
+    """
+        Should be accessed by an admin but GET is part of SAFE METHODS for all
+    """
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]
+    authentication_classes = [CustomJWTAuthentication]
+    def get(self, request, period='day'):
+        now = datetime.now()
+
+        match period:
+            case 'day':
+                start_date = now - timedelta(days=1)
+            case  'week':
+                start_date = now - timedelta(weeks=1)
+            case 'month':
+                start_date = now - timedelta(days=30)
+            case _:
+                return Response({'error': 'Invalid period specified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sales_data = OrderItem.objects.filter(
+            order__created_at__gte=start_date
+        ).values(
+            date=F('order__created_at__date')
+        ).annotate(
+            total_sales=Sum(F('quantity') * F('price'))
+        )
+
+        serializer = SalesReportSerializer(sales_data, many=True)
+        return Response(serializer.data)
