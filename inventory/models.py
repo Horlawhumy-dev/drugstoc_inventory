@@ -43,5 +43,13 @@ class Order(BaseModelMixin):
 class OrderItem(BaseModelMixin):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=0)
-    price = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=1)
+    # price = models.PositiveIntegerField(default=1)
+
+
+    def __str__(self):
+        return f"{self.product.name} ({self.order.id})"
+
+    @property
+    def total_quantity(self):
+        return self.product.count()

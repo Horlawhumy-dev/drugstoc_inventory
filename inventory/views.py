@@ -84,40 +84,13 @@ class OrderListCreate(APIView):
         logger.info(f"User {request.user.id} is attempting to create a new order")
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
-            #rollback db transactions if any fails
-            with transaction.atomic():
-                if self.validate_order_items(serializer.validated_data.get('items', [])):
-                    serializer.save(user=request.user)
-                    logger.info(f"User {request.user.id} successfully created order {serializer.data['id']}")
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                else:
-                    return Response({'error': 'One or more items have insufficient stock.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.save(owner=request.user)
+            logger.info(f"User {request.user.id} successfully created order {serializer.data['id']}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         logger.warning(f"User {request.user.id} failed to create order: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def validate_order_items(self, order_items):
-        """
-        Validate each order item's quantity against available stock.
-        Returns True if all items have sufficient stock, False otherwise.
-        """
-        for item in order_items:
-            product = item['product']
-            quantity_requested = item['quantity']
-
-            # Retrieve the product object
-            try:
-                product_obj = Product.objects.get(id=product.id)
-            except Product.DoesNotExist:
-                logger.error(f"Product with ID {product.id} does not exist.")
-                return False
-
-            # Check if sufficient quantity is available
-            if product_obj.quantity < quantity_requested:
-                logger.warning(f"User {self.request.user.id} tried to order {quantity_requested} of {product_obj.name} but only {product_obj.quantity} available.")
-                return False
-
-        return True
 
 class OrderDetail(APIView):
     """
@@ -128,7 +101,7 @@ class OrderDetail(APIView):
 
     def get_object(self, pk):
         try:
-            return Order.objects.get(pk=pk, user=self.request.user)
+            return Order.objects.get(pk=pk, owner=self.request.user)
         except Order.DoesNotExist:
             logger.error(f"User {self.request.user.id} attempted to access non-existent order {pk}")
             return None
@@ -164,15 +137,15 @@ class OrderStatusUpdate(APIView):
             if not order:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-            status = self.get_status_from_request(request)
-            if not status:
-                return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+            order_status = self.get_status_from_request(request)
+            if not order_status:
+                return Response({'error': 'Invalid order status'}, status=status.HTTP_400_BAD_REQUEST)
 
-            updated_order = self.update_order_status(order, status)
+            updated_order = self.update_order_status(order, order_status)
             if not updated_order:
                 return Response({'error': 'Failed to update status'}, status=status.HTTP_400_BAD_REQUEST)
 
-            logger.info(f"User {request.user.id} successfully updated status of order {pk} to {status}")
+            logger.info(f"User {request.user.id} successfully updated status of order {pk} to {order_status}")
             serializer = OrderSerializer(updated_order)
             return Response(serializer.data)
 
