@@ -2,7 +2,7 @@ API Descriptions:
 
 This application provides a RESTful API for Drugstoc Inventory Management.
 
-Endpoints:
+Auth Endpoints:
 
 1. POST /api/users/register/
    - Description: Create a new user
@@ -22,3 +22,26 @@ Endpoints:
    - Description: Logout auth user
    - Request Body: refresh_token
    - Response: nil
+
+
+Inventory Products Endpoints:
+
+1. POST /api/inventory/products/
+   - Description: Create a new product by admin user
+   - Request Body: name, description, price, quantity, address
+   - Response: id, owner, name, description, price, quantity, created_at, updated_at
+
+2. GET /api/inventory/products
+   - Description: List products for an admin user
+   - Request Body: nil
+   - Response: list of products
+
+3. PUT /api/inventory/products/:id
+   - Description: Update product by an admin user
+   - Response: id, owner, name, description, price, quantity, created_at, updated_at
+
+4. DELETE /api/inventory/products/:id
+   - Description: Delete product published by an admin user
+   - Request Body: nil
+   - Response: nil
+
