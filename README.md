@@ -7,36 +7,8 @@ A simple Django backend for a inventory mananagement that manages users, product
 - Endpoints for managing users authentication and authorization with RBAC
 - Endpoints for products where only admin can make full CRUD operations
 - Basic error handling
-- Normal can create orders with list of products
+- Normal users can create orders with list of products
 - Reporting endpoints for sales and products stock management
-
-## Project Structure
-
-drugstoc_inventory/
-│ ├── init.py
-│ ├── main.py
-│ ├── crud/
-│ │ ├── init.py
-│ │ ├── author.py
-│ │ └── post.py
-│ ├── models/
-│ │ ├── init.py
-│ │ ├── author.py
-│ │ └── post.py
-│ ├── schemas/
-│ │ ├── init.py
-│ │ ├── author.py
-│ │ └── post.py
-│ ├── db/
-│ │ ├── init.py
-│ │ └── database.py
-│ └── api/
-│ ├── init.py
-│ ├── author.py
-│ └── post.py
-└── README.md
-└── run_tests.sh
-└── requirements.txt
 
 
 ## Getting Started

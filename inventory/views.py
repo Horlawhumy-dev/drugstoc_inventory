@@ -1,5 +1,6 @@
 # views.py
 import logging
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -214,4 +215,31 @@ class SalesReportView(APIView):
         )
 
         serializer = SalesReportSerializer(sales_data, many=True)
+        return Response(serializer.data)
+
+
+
+class ProductSearchView(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.AllowAny]
+    authentication_classes = [CustomJWTAuthentication]
+
+    """
+        This will only functional with postgres database connection
+    """
+
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+            logger.warning("Search query not provided.")
+            return Response({"error": "Please provide a search query!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        search_query = SearchQuery(query)
+        search_rank = SearchRank('search_vector', search_query)
+
+        results = Product.objects.filter(search_vector=search_query)\
+            .annotate(rank=search_rank)\
+            .order_by('-rank', '-created_at')
+
+        serializer = ProductSerializer(results, many=True)
+        logger.info(f"Search results returned for query: {query}.")
         return Response(serializer.data)
