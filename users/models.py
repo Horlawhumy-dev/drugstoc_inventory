@@ -20,8 +20,6 @@ class User(AbstractUser):
     email = models.EmailField(_("email address"), unique=True) 
     address = models.CharField(max_length=100, blank=True, null=True)
     metadata = JSONField(default=default_user_metadata)
-    # username = models.CharField(max_length=150, blank=True, null=True)
-
 
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'

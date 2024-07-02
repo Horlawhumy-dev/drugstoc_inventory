@@ -14,6 +14,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate, get_user_model, login
 from django.db import transaction
+from rest_framework.serializers import ValidationError
 
 from .serializers import UserSerializer, UserRegistrationSerializer, JwtTokenObtainPair, UserSerializer
 from .models import BlacklistedAccessToken
