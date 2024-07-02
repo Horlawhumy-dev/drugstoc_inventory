@@ -1,6 +1,6 @@
 API Descriptions:
 
-This application provides a RESTful API for Drugstoc Inventory Management.
+This application provides a RESTful API for Drugstoc Inventory Management BE Assessment.
 
 Auth Endpoints:
 
@@ -45,3 +45,72 @@ Inventory Products Endpoints:
    - Request Body: nil
    - Response: nil
 
+
+Inventory Orders Endpoints:
+
+1. POST /api/inventory/orders/
+   - Description: Create a new order
+   - Request Body: 
+   {
+    "items": [
+        {
+            "product": "0aa9ea8dce",
+            "quantity": 1
+        }
+    ]
+   }
+
+   - Response: order fields data
+
+2. GET /api/inventory/orders/
+   - Description: List orders
+   - Request Body: nil
+   - Response: list of orders
+
+3. PUT /api/inventory/orders/:id/status/
+   - Description: Update order status by an admin user
+   - Request Body:
+   {
+    "status": "completed"
+   }
+   - Response: order fields data
+
+4. DELETE /api/inventory/orders/:id/
+   - Description: Delete order
+   - Request Body: nil
+   - Response: nil
+
+
+5. GET /api/inventory/orders/:id/
+   - Description: Get order detail
+   - Request Body: nil
+   - Response: order data
+
+
+Inventory Report Endpoints:
+
+1. GET /api/inventory/report/stock/
+   - Description: Get product out of stock
+   - Request Body: nil
+   - Response: 
+   [
+      {
+         "id": "0aa9ea8dce",
+         "name": "Product Name",
+         "quantity": 0,
+         "description": "Product Description",
+         "created_at": "2024-07-02T14:15:28.043625+01:00",
+         "updated_at": "2024-07-02T15:37:00.599740+01:00"
+      }
+   ]
+
+2. GET /api/inventory/report/sales/
+   - Description: Get product order sales by certain period
+   - Request Body: nil
+   - Response: 
+   [
+      {
+         "date": "2024-07-02",
+         "total_sales": 400
+      }
+   ]

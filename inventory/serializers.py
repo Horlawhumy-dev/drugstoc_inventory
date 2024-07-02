@@ -26,7 +26,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity']
+        fields = ['id', 'product', 'quantity', 'price']
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -76,7 +76,17 @@ class OrderSerializer(serializers.ModelSerializer):
             item_price = order_quantity * unit_price
             total_order_price += item_price
 
-            OrderItem.objects.create(order=order, product=product_obj, quantity=order_quantity)
+            OrderItem.objects.create(order=order, product=product_obj, quantity=order_quantity, price=total_order_price)
 
             product_obj.quantity -= order_quantity
             product_obj.save()
+
+
+class LowStockProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'quantity', 'description', 'created_at', 'updated_at']
+
+class SalesReportSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    total_sales = serializers.IntegerField()
