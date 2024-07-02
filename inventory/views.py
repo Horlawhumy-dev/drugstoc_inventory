@@ -1,10 +1,14 @@
 # views.py
 import logging
+from django.contrib.postgres.search import SearchQuery, SearchRank
+from django_filters import rest_framework as filters
+
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from rest_framework.pagination import PageNumberPagination
 from django.db.models import Sum, F
 from datetime import datetime, timedelta
 from .models import Product, Order, OrderItem
@@ -23,8 +27,13 @@ class InventoryProductList(APIView):
     def get(self, request):
         logger.info(f"User {request.user.id} requested product list")
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        
+        # Apply pagination
+        paginator = PageNumberPagination()
+        paginated_products = paginator.paginate_queryset(products, request)
+        
+        serializer = ProductSerializer(paginated_products, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class InventoryProductCreate(APIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]
@@ -72,6 +81,17 @@ class InventoryProductDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class OrderFilter(filters.FilterSet):
+    status = filters.CharFilter(field_name='status', lookup_expr='iexact')
+    date_from = filters.DateFilter(field_name='created_at', lookup_expr='gte')
+    date_to = filters.DateFilter(field_name='created_at', lookup_expr='lte')
+
+    class Meta:
+        model = Order
+        fields = ['status', 'created_at']
+
+
+
 class OrderListCreate(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [CustomJWTAuthentication]
@@ -79,6 +99,12 @@ class OrderListCreate(APIView):
     def get(self, request):
         logger.info(f"User {request.user.id} requested their order list")
         orders = Order.objects.filter(owner=request.user)
+        
+        filterset = OrderFilter(request.GET, queryset=orders)
+        if not filterset.is_valid():
+            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        orders = filterset.qs
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
@@ -214,4 +240,31 @@ class SalesReportView(APIView):
         )
 
         serializer = SalesReportSerializer(sales_data, many=True)
+        return Response(serializer.data)
+
+
+
+class ProductSearchView(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.AllowAny]
+    authentication_classes = [CustomJWTAuthentication]
+
+    """
+        This will only functional with postgres database connection
+    """
+
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+            logger.warning("Search query not provided.")
+            return Response({"error": "Please provide a search query!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        search_query = SearchQuery(query)
+        search_rank = SearchRank('search_vector', search_query)
+
+        results = Product.objects.filter(search_vector=search_query)\
+            .annotate(rank=search_rank)\
+            .order_by('-rank', '-created_at')
+
+        serializer = ProductSerializer(results, many=True)
+        logger.info(f"Search results returned for query: {query}.")
         return Response(serializer.data)
