@@ -45,6 +45,13 @@ Inventory Products Endpoints:
    - Request Body: nil
    - Response: nil
 
+Note: This search functionality works when postgres database is used
+5. GET /api/inventory/products/search?q=
+   - Description: Search for products by the specified field
+   - Request Body: nil
+   - Response: list of products
+   - Search From: title, description
+
 
 Inventory Orders Endpoints:
 
@@ -66,6 +73,7 @@ Inventory Orders Endpoints:
    - Description: List orders
    - Request Body: nil
    - Response: list of orders
+   - Filters: status, date_from, date_to
 
 3. PUT /api/inventory/orders/:id/status/
    - Description: Update order status by an admin user

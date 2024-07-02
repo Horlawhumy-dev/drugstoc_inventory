@@ -5,6 +5,8 @@ Pillow==10.3.0
 pytest-django==4.8.0
 django-redis==5.4.0
 
+django_filter==24.2
+
 whitenoise  # https://github.com/evansd/whitenoise
 redis  # https://github.com/redis/redis-py
 hiredis  # https://github.com/redis/hiredis-py
