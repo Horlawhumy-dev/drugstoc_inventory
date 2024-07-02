@@ -2,12 +2,13 @@ from drugstoc_inventory.model_utils import BaseModelMixin
 from django.contrib.postgres.search import SearchVectorField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.conf import settings
 
 
 class Product(BaseModelMixin):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField()
-    owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
     price = models.IntegerField(default=0) #suitable model field like float or decimal might be opted for
     search_vector = SearchVectorField(null=True, blank=True)

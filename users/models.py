@@ -17,9 +17,11 @@ def default_user_metadata():
 
 class User(AbstractUser):
     name = CharField(_("Name of User"), max_length=255)
-    email = models.EmailField(unique=True) 
+    email = models.EmailField(_("email address"), unique=True) 
     address = models.CharField(max_length=100, blank=True, null=True)
     metadata = JSONField(default=default_user_metadata)
+    # username = models.CharField(max_length=150, blank=True, null=True)
+
 
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
@@ -48,7 +50,7 @@ class User(AbstractUser):
                 self.groups.remove(admin_group)
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
 class BlacklistedAccessToken(BaseModelMixin):

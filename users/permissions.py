@@ -1,6 +1,7 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
-class IsAdminOrReadOnly(BasePermission):
+from rest_framework import permissions
+
+class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method in SAFE_METHODS:
+        if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user.is_authenticated and request.user.metadata.get('is_admin')
+        return request.user and request.user.groups.filter(name='Admin').exists() #if user belongs to Admin groups

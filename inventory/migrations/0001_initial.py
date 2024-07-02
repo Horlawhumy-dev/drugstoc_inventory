@@ -41,19 +41,24 @@ def create_product_owner_group(apps, schema_editor):
     
     product_owner_group.permissions.add(*permissions)
 
-def add_search_vector(apps, schema_editor):
-    Product = apps.get_model('inventory', 'Product')
-    # User = apps.get_model(settings.AUTH_USER_MODEL)  # Fetch the User model
+# def add_search_vector(apps, schema_editor):
+#     Product = apps.get_model('inventory', 'Product')
+#     Product.objects.update(search_vector=SearchVector('title', 'description'))
 
-    for product in Product.objects.all():
-        search_vector = SearchVector(
-            'name', 
-            'description', 
-            Value(product.owner.first_name, output_field=CharField()), 
-            Value(product.owner.last_name, output_field=CharField())
-        )
-        product.search_vector = search_vector
-        product.save()
+# def add_search_vector(apps, schema_editor):
+#     Product = apps.get_model('inventory', 'Product')
+#     User = apps.get_model(settings.AUTH_USER_MODEL)
+
+#     for product in Product.objects.select_related('owner').all():
+#         if product.owner:
+#             search_vector = SearchVector(
+#                 'name', 
+#                 'description', 
+#                 Value(product.owner.name, output_field=CharField()),
+#                 Value(product.owner.email, output_field=CharField())
+#             )
+#             product.search_vector = search_vector
+#             product.save()
 
 
 
@@ -118,5 +123,5 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunPython(create_product_owner_group),
-        migrations.RunPython(add_search_vector)
+        # migrations.RunPython(add_search_vector)
     ]
