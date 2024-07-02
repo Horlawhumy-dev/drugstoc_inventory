@@ -11,6 +11,10 @@ A simple Django backend for a inventory mananagement that manages users, product
 - Reporting endpoints for sales and products stock management
 
 
+## SQL Database Design
+
+    [SQLDesign](https://drawsql.app/teams/peaknews/diagrams/drugstoc-inventory)
+
 ## Getting Started
 
 ### Prerequisites
@@ -50,6 +54,11 @@ A simple Django backend for a inventory mananagement that manages users, product
 
     ```bash
         make runserver
+    ```
+6. **Create Super User**
+
+    ```bash
+        make createsuperuser
     ```
 
 ## Internal API Endpoints Documentation
