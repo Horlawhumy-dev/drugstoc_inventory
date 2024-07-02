@@ -4,21 +4,21 @@ This application provides a RESTful API for Drugstoc Inventory Management.
 
 Endpoints:
 
-1. POST `/api/users/register/`
+1. POST /api/users/register/
    - Description: Create a new user
    - Request Body: name, email, password, password2, address
    - Response: name, email, password, password2, address
 
-2. POST `/api/users/login/`
+2. POST /api/users/login/
    - Description: login user
    - Request Body: email, password
    - Response: id, metadata, refresh_token, access_token
 
-3. GET `/api/users/profile`
+3. GET /api/users/profile
    - Description: Retrieve user profile by access token provided
    - Response: all user fields
 
-4. POST `/api/users/logout/`
-   - Description: Logout user
+4. POST /api/users/logout/
+   - Description: Logout auth user
    - Request Body: refresh_token
    - Response: nil
