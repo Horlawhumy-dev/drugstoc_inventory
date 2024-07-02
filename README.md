@@ -67,10 +67,10 @@ drugstoc_inventory/
         make migrate
     ```
 
-4. **Run and Excute Tests Script**
+4. **Run and Execute Tests Script**
 
     ```
-        chmod +x run_tests.sh
+        chmod +x run_tests.sh # Make it executable script
         ./run_tests.sh
     ```
 
