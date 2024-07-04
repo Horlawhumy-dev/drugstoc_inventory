@@ -91,3 +91,17 @@ def test_create_product_with_valid_data(api_client, admin_user, product_data, ge
 def test_unauthenticated_user_cannot_create_product(api_client, product_data):
     response = api_client.post('/api/inventory/products/add/', product_data, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+
+@pytest.mark.django_db
+def test_product_detail(api_client, admin_user, product_data, get_token):
+    product = Product.objects.create(owner=admin_user, **product_data)
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    response = api_client.get(f'/api/inventory/products/{product.pk}/')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['name'] == product_data['name']
+    assert response.data['description'] == product_data['description']
+    assert response.data['quantity'] == product_data['quantity']
+    assert response.data['price'] == product_data['price']
