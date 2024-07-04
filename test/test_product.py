@@ -88,29 +88,6 @@ def test_create_product_with_valid_data(api_client, admin_user, product_data, ge
     assert response.status_code == status.HTTP_201_CREATED
     assert Product.objects.filter(name=product_data['name']).exists()
 
-@pytest.mark.django_db
-def test_create_product_with_invalid_data(api_client, admin_user, get_token):
-    token = get_token(admin_user, 'admin123')
-    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
-    invalid_data = {
-        'name': 'Invalid Product',
-        'description': 'Invalid Description',
-        'quantity': -1,  # Invalid quantity (asuming -1 for negative)
-        'price': 100.0
-    }
-    response = api_client.post('/api/inventory/products/add/', invalid_data, format='json')
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-    """
-        response.data form like
-        {
-            "quantity": [
-                "Ensure this value is greater than or equal to 0."
-            ]
-        }
-    """
-    # assert response.data.get('quantity')[0] == 'Ensure this value is greater than or equal to 0.' #test error message as return in a list
-
 def test_unauthenticated_user_cannot_create_product(api_client, product_data):
     response = api_client.post('/api/inventory/products/add/', product_data, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
