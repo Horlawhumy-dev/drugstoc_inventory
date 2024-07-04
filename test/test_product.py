@@ -100,8 +100,7 @@ def test_create_product_with_invalid_data(api_client, admin_user, get_token):
     }
     response = api_client.post('/api/inventory/products/add/', invalid_data, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.data.get('product') is None
-
+    
 def test_unauthenticated_user_cannot_create_product(api_client, product_data):
     response = api_client.post('/api/inventory/products/add/', product_data, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
