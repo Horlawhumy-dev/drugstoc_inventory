@@ -7,8 +7,8 @@ from .views import (InventoryProductList, InventoryProductCreate,
 app_name = 'inventory'
 
 urlpatterns = [
-    path('products', InventoryProductList.as_view(), name='product_list'),
-    path('products/', InventoryProductCreate.as_view(), name='product_add'),
+    path('products/', InventoryProductList.as_view(), name='product_list'),
+    path('products/add/', InventoryProductCreate.as_view(), name='product_add'), #test required to distinguish url not only with slash
     path('products/<str:pk>/', InventoryProductDetail.as_view(), name='product_detail'),
     path('orders/', OrderListCreate.as_view(), name='order_list_create'),
     path('orders/<str:pk>/', OrderDetail.as_view(), name='order_detail'),
