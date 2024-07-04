@@ -30,25 +30,25 @@ Auth Endpoints:
 
 Inventory Products Endpoints:
 
-1. POST /api/inventory/products/
+1. POST /api/inventory/products/add//
    - Description: Create a new product by admin user
    - Request Body: name, description, price, quantity, address
    - Auth: Bearer token
    - Response: id, owner, name, description, price, quantity, created_at, updated_at
 
-2. GET /api/inventory/products
+2. GET /api/inventory/products/
    - Description: List products for an admin user
    - Request Body: nil
    - Auth: Bearer token
    - Response: list of products
 
-3. PUT /api/inventory/products/:id
+3. PUT /api/inventory/products/:id/
    - Description: Update product by an admin user
    - Request Body: any field(s)
    - Auth: Bearer token
    - Response: id, owner, name, description, price, quantity, created_at, updated_at
 
-4. DELETE /api/inventory/products/:id
+4. DELETE /api/inventory/products/:id/
    - Description: Delete product published by an admin user
    - Request Body: nil
    - Auth: Bearer token
