@@ -221,15 +221,18 @@ class SalesReportView(APIView):
     def get(self, request, period='day'):
         now = datetime.now()
 
-        match period:
-            case 'day':
-                start_date = now - timedelta(days=1)
-            case  'week':
-                start_date = now - timedelta(weeks=1)
-            case 'month':
-                start_date = now - timedelta(days=30)
-            case _:
-                return Response({'error': 'Invalid period specified.'}, status=status.HTTP_400_BAD_REQUEST)
+        start_project = None
+
+        #match case would have been better but its only supported by python3.8+
+
+        if period == 'day':
+            start_date = now - timedelta(days=1)
+        elif period ==  'week':
+            start_date = now - timedelta(weeks=1)
+        elif period == 'month':
+            start_date = now - timedelta(days=30)
+        else:
+            return Response({'error': 'Invalid period specified.'}, status=status.HTTP_400_BAD_REQUEST)
 
         sales_data = OrderItem.objects.filter(
             order__created_at__gte=start_date
