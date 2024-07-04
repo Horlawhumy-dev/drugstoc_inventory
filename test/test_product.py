@@ -33,7 +33,7 @@ def product_data():
     return {
         'name': 'Test Product',
         'description': 'Test Description',
-        'quantity': 10,
+        'quantity': 5,
         'price': 100.0
     }
 
@@ -105,3 +105,22 @@ def test_product_detail(api_client, admin_user, product_data, get_token):
     assert response.data['description'] == product_data['description']
     assert response.data['quantity'] == product_data['quantity']
     assert response.data['price'] == product_data['price']
+
+
+
+@pytest.mark.django_db
+def test_low_stock_report(api_client, admin_user, product_data, get_token):
+    # Create a product with low stock less than 10 porducts
+    low_stock_product = Product.objects.create(owner=admin_user, **product_data)
+
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+    # Request the low stock report
+    response = api_client.get('/api/inventory/report/stock/')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data[0]['quantity'] < 10  # Assuming low stock threshold is less than 10
+
+def test_unauthenticated_user_cannot_access_low_stock_report(api_client):
+    response = api_client.get('/api/inventory/report/stock/')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
