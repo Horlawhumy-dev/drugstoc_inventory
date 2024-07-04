@@ -145,3 +145,69 @@ def test_unauthenticated_user_cannot_access_low_stock_report(api_client):
 
 
 
+
+""" Order test cases """
+
+@pytest.mark.django_db
+def test_regular_user_add_product_to_order(api_client, regular_user, product_data, get_token):
+    token = get_token(regular_user, 'user123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=regular_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 1}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+
+@pytest.mark.django_db
+def test_admin_user_add_product_to_order(api_client, admin_user, product_data, get_token):
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=admin_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 2}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+
+@pytest.mark.django_db
+def test_order_detail(api_client, admin_user, product_data, get_token):
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=admin_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 1}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+    
+    # Retrieve order detail
+    order_id = response.data['id']
+    detail_response = api_client.get(f'/api/inventory/orders/{order_id}/')
+    assert detail_response.status_code == status.HTTP_200_OK
+    assert detail_response.data['id'] == order_id
+    assert len(detail_response.data) > 1  # Ensure the product is part of the order
+
+
+
