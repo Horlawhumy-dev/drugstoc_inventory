@@ -121,6 +121,27 @@ def test_low_stock_report(api_client, admin_user, product_data, get_token):
     assert response.status_code == status.HTTP_200_OK
     assert response.data[0]['quantity'] < 10  # Assuming low stock threshold is less than 10
 
+
+
+@pytest.mark.django_db
+def test_sales_report(api_client, admin_user, product_data, get_token):
+    # Assume some sales have occurred in the specified period
+    period = 'day'  # Example sales period
+
+    # Perform authentication
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+    # Request the sales report for the specified period
+    response = api_client.get(f'/api/inventory/report/sales/{period}/')
+    assert response.status_code == status.HTTP_200_OK
+
+    assert 'total_sales' not in response.data
+    assert len(response.data) <= 0
+
 def test_unauthenticated_user_cannot_access_low_stock_report(api_client):
     response = api_client.get('/api/inventory/report/stock/')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+
