@@ -33,7 +33,7 @@ def product_data():
     return {
         'name': 'Test Product',
         'description': 'Test Description',
-        'quantity': 10,
+        'quantity': 5,
         'price': 100.0
     }
 
@@ -91,3 +91,123 @@ def test_create_product_with_valid_data(api_client, admin_user, product_data, ge
 def test_unauthenticated_user_cannot_create_product(api_client, product_data):
     response = api_client.post('/api/inventory/products/add/', product_data, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+
+@pytest.mark.django_db
+def test_product_detail(api_client, admin_user, product_data, get_token):
+    product = Product.objects.create(owner=admin_user, **product_data)
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    response = api_client.get(f'/api/inventory/products/{product.pk}/')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['name'] == product_data['name']
+    assert response.data['description'] == product_data['description']
+    assert response.data['quantity'] == product_data['quantity']
+    assert response.data['price'] == product_data['price']
+
+
+
+@pytest.mark.django_db
+def test_low_stock_report(api_client, admin_user, product_data, get_token):
+    # Create a product with low stock less than 10 porducts
+    low_stock_product = Product.objects.create(owner=admin_user, **product_data)
+
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+    # Request the low stock report
+    response = api_client.get('/api/inventory/report/stock/')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data[0]['quantity'] < 10  # Assuming low stock threshold is less than 10
+
+
+
+@pytest.mark.django_db
+def test_sales_report(api_client, admin_user, product_data, get_token):
+    # Assume some sales have occurred in the specified period
+    period = 'day'  # Example sales period
+
+    # Perform authentication
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+    # Request the sales report for the specified period
+    response = api_client.get(f'/api/inventory/report/sales/{period}/')
+    assert response.status_code == status.HTTP_200_OK
+
+    assert 'total_sales' not in response.data
+    assert len(response.data) <= 0
+
+def test_unauthenticated_user_cannot_access_low_stock_report(api_client):
+    response = api_client.get('/api/inventory/report/stock/')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+
+
+""" Order test cases """
+
+@pytest.mark.django_db
+def test_regular_user_add_product_to_order(api_client, regular_user, product_data, get_token):
+    token = get_token(regular_user, 'user123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=regular_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 1}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+
+@pytest.mark.django_db
+def test_admin_user_add_product_to_order(api_client, admin_user, product_data, get_token):
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=admin_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 2}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+
+@pytest.mark.django_db
+def test_order_detail(api_client, admin_user, product_data, get_token):
+    token = get_token(admin_user, 'admin123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+    
+    # Create a product first
+    product = Product.objects.create(owner=admin_user, **product_data)
+    
+    # Create an order with the product
+    order_data = {
+        'items': [
+            {'product': product.id, 'quantity': 1}
+        ],
+    }
+    
+    response = api_client.post('/api/inventory/orders/', order_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+    
+    # Retrieve order detail
+    order_id = response.data['id']
+    detail_response = api_client.get(f'/api/inventory/orders/{order_id}/')
+    assert detail_response.status_code == status.HTTP_200_OK
+    assert detail_response.data['id'] == order_id
+    assert len(detail_response.data) > 1  # Ensure the product is part of the order
+
+
+
