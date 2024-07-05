@@ -10,6 +10,10 @@ Auth Endpoints:
    - Auth: Not required
    - Response: name, email, password, password2, address
 
+Note: The register endpoint above creates a normal user account. However, an admin account can be gotten from a normal
+      user account when a superuser logins to Django admin page and update `is_admin` metadata to `true`
+      and add `Admin` group for the user.
+      
 2. POST /api/users/login/
    - Description: login user
    - Request Body: email, password
