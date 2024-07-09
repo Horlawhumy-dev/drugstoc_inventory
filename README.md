@@ -51,7 +51,8 @@ A simple Django backend for a inventory mananagement that manages users, product
 4. **Run and Execute Tests Script**
 
     ```
-        chmod +x run_tests.sh # Make it executable script
+         ##Make the script executable by
+         chmod +x run_tests.sh
         ./run_tests.sh
     ```
 
