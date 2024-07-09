@@ -2,6 +2,11 @@
 
 A simple Django backend for a inventory mananagement that manages users, products, orders and reports. It supports basic CRUD (Create, Read, Update, Delete) operations for all services.
 
+### Note: Future enhancements would be to use:
+** Redis for catching
+** Kafka for sending stream of orders
+** Introduce email engine for notifications
+
 ## Features
 
 - Endpoints for managing users authentication and authorization with RBAC
@@ -66,3 +71,4 @@ A simple Django backend for a inventory mananagement that manages users, product
     ```
         ./api_doc.txt file
     ```
+## Assessment Feedback 🙏
