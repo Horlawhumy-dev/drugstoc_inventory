@@ -2,7 +2,7 @@
 import logging
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django_filters import rest_framework as filters
-
+from django.db import transaction
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -271,3 +271,36 @@ class ProductSearchView(APIView):
         serializer = ProductSerializer(results, many=True)
         logger.info(f"Search results returned for query: {query}.")
         return Response(serializer.data)
+
+    
+from django.db.models import Sum
+
+class FrequentOrderedProductView(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        #returns the first instance of most frequent 9by quantity summation) ordered item product in the past
+        with transaction.atomic():
+            most_frequent_product = (
+                OrderItem.objects
+                    .filter(order__owner=user)
+                    .values('product')
+                    .annotate(total_quantity=Sum('quantity'))
+                    .order_by('total_quantity') #highest quantity down to least
+                    .first()
+            ) 
+            if most_frequent_product:
+                product = Product.objects.get(id=most_frequent_product['product'])
+                serializer = ProductSerializer(product)
+                return Response(
+                    {
+                        "product_name": serializer.data.get('name'),
+                        "total_quantity": serializer.data.get('quantity')
+                    }
+                )
+            else:
+                return Response({"detail": "No frequent ordered product found."}, status=404)
+
+        

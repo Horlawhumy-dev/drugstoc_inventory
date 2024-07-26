@@ -2,7 +2,7 @@
 from django.urls import path
 from .views import (InventoryProductList, InventoryProductCreate,
      InventoryProductDetail,OrderListCreate, OrderDetail, OrderStatusUpdate,
-     LowStockReportView, SalesReportView, ProductSearchView)
+     LowStockReportView, SalesReportView, ProductSearchView, FrequentOrderedProductView)
 
 app_name = 'inventory'
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('orders/<str:pk>/status/', OrderStatusUpdate.as_view(), name='order_status_update'),
     path('report/stock/', LowStockReportView.as_view(), name='low-stock-report'),
     path('report/sales/<str:period>/', SalesReportView.as_view(), name='sales-report'),
+    path('report/order/frequent', FrequentOrderedProductView.as_view(), name='frequent-ordered-product'),
     #Search will only functional with postgres database connection
     path('products/search', ProductSearchView.as_view(), name='products-search')
 ]

@@ -10,10 +10,10 @@ Auth Endpoints:
    - Auth: Not required
    - Response: name, email, password, password2, address
 
-Note: The register endpoint above creates a normal user account. However, an admin account can be gotten from a normal
-      user account when a superuser logins to Django admin page and update `is_admin` metadata to `true`
-      and add `Admin` group for the user.
-      
+Note: The register endpoint would create normal user account. To make a account an admin, a superuser would have to login to
+Django admin page and update the user account `is_admin` metadata to `true` and add `Admin` group for the user too.
+Then the normal user account turn to an admin that can add, update and delete products.
+
 2. POST /api/users/login/
    - Description: login user
    - Request Body: email, password
@@ -134,22 +134,6 @@ Inventory Report Endpoints:
 
 2. GET /api/inventory/report/sales/
    - Description: Get product order sales by certain period
-   - Request Body: nil
-   - Auth: Bearer token
-   - Response: 
-      {
-         "id": "21c7f528da",
-         "name": "Product beast",
-         "description": "Product beast Description",
-         "quantity": 4,
-         "price": 100,
-         "created_at": "2024-07-26T13:22:49.098161+01:00",
-         "updated_at": "2024-07-26T13:24:23.399251+01:00",
-         "owner": "Admin"
-      }
-
-3. GET /api/inventory/report/order/frequent
-   - Description: Get product ordered frequent with most quantity
    - Request Body: nil
    - Auth: Bearer token
    - Response: 

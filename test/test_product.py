@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from users.models import User
 from django.contrib.auth import authenticate
-from inventory.models import Product
+from inventory.models import Product, Order, OrderItem
 
 
 @pytest.fixture
@@ -210,4 +210,32 @@ def test_order_detail(api_client, admin_user, product_data, get_token):
     assert len(detail_response.data) > 1  # Ensure the product is part of the order
 
 
+@pytest.mark.django_db
+def test_most_frequently_ordered_product(api_client, regular_user, product_data, get_token):
+    token = get_token(regular_user, 'user123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
 
+    # Create products
+    product1 = Product.objects.create(owner=regular_user, **product_data)
+
+    # Create orders with order items
+    order1 = Order.objects.create(owner=regular_user)
+    order2 = Order.objects.create(owner=regular_user)
+
+    item1 = OrderItem.objects.create(order=order1, product=product1, quantity=3, price=product1.price)
+    item2 = OrderItem.objects.create(order=order2, product=product1, quantity=4, price=product1.price)
+
+    # Call the endpoint to get the most frequently ordered product
+    response = api_client.get('/api/inventory/report/order/frequent')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['product_name'] == product1.name
+    assert response.data['total_quantity'] > item1.quantity
+
+@pytest.mark.django_db
+def test_no_orders_for_user(api_client, regular_user, get_token):
+    token = get_token(regular_user, 'user123')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+    response = api_client.get('/api/inventory/report/order/frequent')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.data['detail'] == "No frequent ordered product found."
