@@ -1,6 +1,6 @@
-# Drugstoc Inventory Management APIs Assessment
+# Drugstoc Inventory Management APIs
 
-A simple Django backend for a inventory mananagement that manages users, products, orders and reports. It supports basic CRUD (Create, Read, Update, Delete) operations for all services.
+A Django backend for a inventory mananagement that manages users, products, orders and reports. It supports basic CRUD (Create, Read, Update, Delete) operations for all services.
 
 ### Note: Future enhancements would be to use:
 ** Redis for catching
